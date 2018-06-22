@@ -1,15 +1,22 @@
 <?php
 
-require_once('connconfig2.php');
+$db_host = 'localhost'; 
+$db_user = 'root'; 
+$db_pass = ''; 
+$db_name = 'essentialmode'; 
 
-if($dbc === false){
-    die("Error: Far ikke kontakt med databasen." . mysqli_error());
+$dbc = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$dbc) {
+	die ('Faar ikke kontakt med databasen!: ' . mysqli_connect_error());	
 }
 
-$query = "SELECT `identifier` FROM user_whitelist WHERE `delete` = 1";
+$query = "SELECT * FROM user_whitelist WHERE `delete` = 1";
+
+
 if ($result = $dbc->query($query)) {
     while ($row = $result->fetch_row()) {
         printf("%s\n", $row[0]);
+        $dbc->real_query("INSERT INTO user_removed (`identifier`, `whitelisted`, `Label`) VALUES ('$row[0]', '$row[1]', '$row[2]');");
         $dbc->real_query("DELETE FROM `users` WHERE `identifier` = '$row[0]'");
         $dbc->real_query("DELETE FROM `addon_account_data` WHERE `owner` = '$row[0]'");
         $dbc->real_query("DELETE FROM `addon_inventory_items` WHERE `owner` = '$row[0]'");
@@ -26,7 +33,8 @@ if ($result = $dbc->query($query)) {
         $dbc->real_query("DELETE FROM `user_hangard` WHERE `identifier` = '$row[0]'");
         $dbc->real_query("DELETE FROM `user_inventory` WHERE `identifier` = '$row[0]'");
         $dbc->real_query("DELETE FROM `user_licenses` WHERE `identifier` = '$row[0]'");
-        $dbc->real_query("UPDATE `user_whitelist` SET `delete`='2' WHERE  `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `user_whitelist` WHERE `identifier` = '$row[0]'");
+
     }
     $result->close();
 }
