@@ -1,73 +1,35 @@
 <?php
-ECHO "under construction";
 
+require_once('connconfig2.php');
 
-/*
-$sql = "SELECT Lastname FROM Persons ORDER BY LastName;";
-$sql .= "SELECT Country FROM Customers";
-
-// Execute multi query
-if (mysqli_multi_query($con,$sql))
-{
-  do
-    {
-    // Store first result set
-    if ($result=mysqli_store_result($con)) {
-      // Fetch one and one row
-      while ($row=mysqli_fetch_row($result))
-        {
-        printf("%s\n",$row[0]);
-        }
-      // Free result set
-      mysqli_free_result($result);
-      }
-    }
-  while (mysqli_next_result($con));
+if($dbc === false){
+    die("Error: Far ikke kontakt med databasen." . mysqli_error());
 }
 
-*/
-
-mysqli_close($dbc);
-?>
-
-<?php
-    foreach ($links as $link) {
-        if ($result = $link->reap_async_query()) {
-            print_r($result->fetch_row());
-            mysqli_free_result($result);
-            $processed++;
-        }
-    }
-?>
-
-The data is accessible via:
-<?php
-    foreach ($links as $link) {
-        if ($result = $link->reap_async_query()) {
-            //This works for SELECT
-            if(is_object($result)){
-                print_r($result->fetch_row());
-                mysqli_free_result($result);
-            }
-            //This works for INSERT/UPDATE/DELETE
-            else {
-                print_r($link);
-            }
-            $processed++;
-        }
-    }
-?>
-
-$query = "SELECT Name, CountryCode, District FROM myCity";
-if ($result = $mysqli->query($query)) {
+$query = "SELECT `identifier` FROM user_whitelist WHERE `delete` = 1";
+if ($result = $dbc->query($query)) {
     while ($row = $result->fetch_row()) {
-        printf("%s (%s,%s)\n", $row[0], $row[1], $row[2]);
+        printf("%s\n", $row[0]);
+        $dbc->real_query("DELETE FROM `users` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `addon_account_data` WHERE `owner` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `addon_inventory_items` WHERE `owner` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `billing` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `characters` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `datastore_data` WHERE `owner` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `owned_hangard` WHERE `owner` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `owned_properties` WHERE `owner` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `owned_vehicles` WHERE `owner` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `playersTattoos` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `users` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `user_accounts` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `user_contacts` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `user_hangard` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `user_inventory` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("DELETE FROM `user_licenses` WHERE `identifier` = '$row[0]'");
+        $dbc->real_query("UPDATE `user_whitelist` SET `delete`='2' WHERE  `identifier` = '$row[0]'");
     }
-    /* free result set */
     $result->close();
 }
 
-/* remove table */
-$mysqli->query("DROP TABLE myCity");
-
-$db->real_query("Select * From users Where username='$username' And password='$password'");
+mysqli_close($dbc);
+?>
