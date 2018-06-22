@@ -29,3 +29,31 @@ if (mysqli_multi_query($con,$sql))
 
 mysqli_close($dbc);
 ?>
+
+<?php
+    foreach ($links as $link) {
+        if ($result = $link->reap_async_query()) {
+            print_r($result->fetch_row());
+            mysqli_free_result($result);
+            $processed++;
+        }
+    }
+?>
+
+The data is accessible via:
+<?php
+    foreach ($links as $link) {
+        if ($result = $link->reap_async_query()) {
+            //This works for SELECT
+            if(is_object($result)){
+                print_r($result->fetch_row());
+                mysqli_free_result($result);
+            }
+            //This works for INSERT/UPDATE/DELETE
+            else {
+                print_r($link);
+            }
+            $processed++;
+        }
+    }
+?>
