@@ -69,3 +69,5 @@ if ($result = $mysqli->query($query)) {
 
 /* remove table */
 $mysqli->query("DROP TABLE myCity");
+
+$db->real_query("Select * From users Where username='$username' And password='$password'");
