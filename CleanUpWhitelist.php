@@ -57,3 +57,15 @@ The data is accessible via:
         }
     }
 ?>
+
+$query = "SELECT Name, CountryCode, District FROM myCity";
+if ($result = $mysqli->query($query)) {
+    while ($row = $result->fetch_row()) {
+        printf("%s (%s,%s)\n", $row[0], $row[1], $row[2]);
+    }
+    /* free result set */
+    $result->close();
+}
+
+/* remove table */
+$mysqli->query("DROP TABLE myCity");
