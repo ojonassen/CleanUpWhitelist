@@ -1,0 +1,33 @@
+<?php
+
+$db_host = 'localhost'; 
+$db_user = 'root'; 
+$db_pass = ''; 
+$db_name = 'essentialmode'; 
+
+$dbc = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$dbc) {
+	die ('Faar ikke kontakt med databasen!: ' . mysqli_connect_error());	
+}
+
+//Skriv navnet paa gjenstanden her, bruk navnet i attribute 'name' i table 'itmes':
+$slett = 'HER!';
+
+$query = "SELECT * FROM items WHERE `name` = '$slett'";
+
+if ($result = $dbc->query($query)) {
+    while ($row = $result->fetch_row()) {
+        printf("%s\n", $row[1]);
+        echo "--";
+        printf("%s\n", utf8_encode($row[2]));
+        echo ": er slettet";
+        echo "<br>";
+        $dbc->real_query("DELETE FROM `items` WHERE `name` = '$row[1]'");
+        $dbc->real_query("DELETE FROM `user_inventory` WHERE `item` = '$row[1]'");
+
+    }
+    $result->close();
+}
+
+mysqli_close($dbc);
+?>
